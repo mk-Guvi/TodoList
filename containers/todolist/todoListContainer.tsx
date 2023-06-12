@@ -77,7 +77,7 @@ function TodoListContainer() {
 
   return (
     <TodoListContext.Provider value={{ ...state, onChangeState }}>
-      <Container className="sm:w-3/6 bg-white mx-auto border rounded-md shadow-md p-6 ">
+      <Container className="sm:w-3/6 m-auto  p-6 ">
         <div className="h-1/6 px-2 flex items-center space-x-2 gap-2 w-full">
           <div className="flex flex-1 flex-col space-y-2">
             <LargeText className="text-xl font-medium break-words">Welcome back, {data?.user?.name || 'New User'}</LargeText>
@@ -86,10 +86,10 @@ function TodoListContainer() {
           <Icon
             onClick={() => signOut()}
             icon="log-out"
-            className="p-1 rounded text-gray-700 transition-all h-6 w-6 duration-150 hover:bg-gray-100 cursor-pointer"
+            className="p-1 rounded text-gray-700 transition-all h-6 w-6 duration-150 hover:bg-gray-200 cursor-pointer"
           />
         </div>
-        <div className="h-5/6 w-full  ">
+        <div className="h-5/6 w-full  pt-4 sm:pt-2 ">
           <TodolistRenderer />
         </div>
       </Container>

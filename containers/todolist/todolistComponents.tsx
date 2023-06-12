@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { ReactElement, useContext, useEffect, useState } from 'react';
 import { Icon } from '../../components';
 import { Checkbox } from '../../components/sharedComponents/Checkbox';
 import { Text } from '../../components/typography';
@@ -68,9 +68,9 @@ export const TodoListEditor = (props: TodoListEditorPropsT) => {
 
       <Icon
         icon="check"
-        className={` text-gray-600 ${
-          editorState.taskName ? 'w-fit p-1 cursor-pointer' : 'w-0'
-        } transition-all duration-200 hover:bg-gray-100  rounded-md`}
+        className={` p-1 rounded text-gray-700 transition-all h-6 w-6 duration-150  ${
+          editorState?.taskName ? 'cursor-pointer hover:bg-gray-200' : ''
+        }`}
         onClick={handleSave}
       />
     </div>
@@ -82,12 +82,13 @@ type TodolistItemPropsT = {
   onSaveEdit: (id: string, parentId: string | null, updatedData: Partial<TodoListT>) => void;
   onDelete: (id: string, parentId: string | null) => void;
   onAddTask: (payload: AddListByIdPayloadT) => void;
+  children: ReactElement[] | null;
 };
 export const TodolistItem = (props: TodolistItemPropsT) => {
   const { data, onSaveEdit, onDelete, onAddTask } = props;
   const { editingItems, collapsedItems, onChangeState } = useContext(TodoListContext);
   return (
-    <div className={`${!data?.parentId ? 'rounded-lg shadow-md' : ''} p-2 border`}>
+    <div className={`${!data?.parentId ? 'rounded-lg shadow-md border p-2 mx-0.5' : ''}  bg-white `}>
       {editingItems?.[data?.id] ? (
         <TodoListEditor
           placeholder="Edit a task"
@@ -116,7 +117,9 @@ export const TodolistItem = (props: TodolistItemPropsT) => {
           {data?.children?.length ? (
             <Icon
               icon="chevron-down"
-              className="p-0.5 rounded text-gray-500 transition-all h-6 w-6 duration-150 hover:bg-gray-100 cursor-pointer"
+              className={`p-0.5 rounded text-gray-500 transition-all h-6 w-6 duration-150 hover:bg-gray-100 cursor-pointer ${
+                collapsedItems?.[data?.id] ? 'rotate-180' : ''
+              }`}
               onClick={(e) => {
                 e.stopPropagation();
                 onChangeState({
@@ -157,6 +160,7 @@ export const TodolistItem = (props: TodolistItemPropsT) => {
           />
         </div>
       )}
+      {props?.children}
     </div>
   );
 };

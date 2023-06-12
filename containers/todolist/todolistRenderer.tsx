@@ -1,10 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
-import { Icon } from '../../components';
-import { Checkbox } from '../../components/sharedComponents/Checkbox';
-import { Text } from '../../components/typography';
 import { makeId, useDebounce } from '../../utils';
 import { TodoListContext, TodoListStatusT, TodoListT } from './todoListContainer';
-import { TodoListEditor } from './todolistComponents';
+import { TodoListEditor, TodolistItem } from './todolistComponents';
 
 type TodosStateT = {
   loading: boolean;
@@ -111,6 +108,7 @@ function TodolistRenderer() {
 
   const handleUpdateList = (id: string, parentId: string | null, updatedData: Partial<TodoListT>) => {
     const updatedList = updateListById({ id, parentId, updatedData });
+    onChangeState({ editingItems: { ...editingItems, [id]: false } });
     handleState({
       list: updatedList,
     });
@@ -198,81 +196,9 @@ function TodolistRenderer() {
   const RenderTodos = (list: TodoListT[]) => {
     return list?.map((data) => {
       return (
-        <div key={data?.id} className="flex-col flex space-y-2">
-          <div className={`${!data?.parentId ? 'rounded-lg shadow-md border p-2' : ''}  `}>
-            {editingItems?.[data?.id] ? (
-              <TodoListEditor
-                placeholder="Edit a task"
-                data={{
-                  taskName: data?.label,
-                  status: data?.status,
-                }}
-                onSave={(taskName, status) => {
-                  onChangeState({ editingItems: { ...editingItems, [data.id]: false } });
-                  handleUpdateList(data?.id, data?.parentId, {
-                    label: taskName,
-                    status,
-                  });
-                }}
-              />
-            ) : (
-              <div className="flex p-1 items-center space-x-2 gap-2 sm:gap-0 flex-wrap">
-                <Checkbox
-                  checked={data?.status === 'COMPLETED'}
-                  onClick={() => {
-                    handleUpdateList(data?.id, data?.parentId, {
-                      status: data?.status === 'COMPLETED' ? 'PENDING' : 'COMPLETED',
-                    });
-                  }}
-                />
-                <Text className="break-words flex-1">{data?.label}</Text>
-                {data?.children?.length ? (
-                  <Icon
-                    icon="chevron-down"
-                    className="p-0.5 rounded text-gray-500 transition-all h-6 w-6 duration-150 hover:bg-gray-100 cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onChangeState({
-                        collapsedItems: { ...collapsedItems, [data?.id]: !collapsedItems?.[data?.id] },
-                      });
-                    }}
-                  />
-                ) : null}
-                <Icon
-                  icon="plus"
-                  className="p-0.5 rounded text-gray-500 transition-all h-6 w-6 duration-150 hover:bg-gray-100 cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onChangeState({
-                      collapsedItems: { ...collapsedItems, [data?.id]: true },
-                    });
-                    onAddTask({
-                      parentId: data?.parentId,
-                      type: 'CHILD',
-                      id: data?.id,
-                    });
-                  }}
-                />
-
-                <Icon
-                  icon="edit-2"
-                  className="p-1 rounded text-gray-500 transition-all h-6 w-6 duration-150 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => {
-                    onChangeState({ editingItems: { ...editingItems, [data.id]: !editingItems?.[data.id] } });
-                  }}
-                />
-                <Icon
-                  icon="trash"
-                  className="p-1 rounded text-red-500 transition-all duration-150 hover:opacity-70 hover:bg-red-100 cursor-pointer"
-                  onClick={() => {
-                    handleDelete(data.id, data.parentId);
-                  }}
-                />
-              </div>
-            )}
-            {data?.children?.length && collapsedItems?.[data.id] ? RenderTodos(data?.children) : null}
-          </div>
-        </div>
+        <TodolistItem data={data} key={data?.id} onAddTask={onAddTask} onDelete={handleDelete} onSaveEdit={handleUpdateList}>
+          {data?.children?.length && collapsedItems?.[data.id] ? RenderTodos(data?.children) : null}
+        </TodolistItem>
       );
     });
   };
@@ -288,11 +214,11 @@ function TodolistRenderer() {
             status,
           });
         }}
-        containerClassName="px-3"
+        containerClassName="px-4"
       />
-      <div className="flex-1 overflow-auto flex flex-col space-y-3">{RenderTodos(state.list)}</div>
+      <div className="flex-1 overflow-auto flex flex-col space-y-3 ">{RenderTodos(state.list)}</div>
     </div>
   );
 }
-
+5;
 export default TodolistRenderer;
