@@ -21,6 +21,7 @@ export const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const router = useRouter();
   const formik = useFormik({
     initialValues: {
@@ -48,20 +49,28 @@ export const Login = () => {
   }
 
   const handleGoogleSignin = async () => {
+    setGoogleLoading(true);
     await signIn('google', {
       callbackUrl: 'http://localhost:3000',
       redirect: true,
     });
+    setGoogleLoading(false);
   };
   return (
-    <Container className='h-screen w-screen'>
+    <Container className="h-screen w-screen">
       <AuthLayout>
         <div className="flex  flex-col space-y-1">
           <h1 className="font-bold text-3xl">Sign In</h1>
           <p className="text-xs">Sign in to your account</p>
         </div>
         <button type="button" className={styles.button_custom} onClick={handleGoogleSignin}>
-          <Image src={GoogleSvg.src} width="17" className="mt-0.5 mr-2" height={'17'} alt="Google" /> Sign In With Google
+          {googleLoading ? (
+            <LoaderSvg type="SECONDARY" size="5" />
+          ) : (
+            <>
+              <Image src={GoogleSvg.src} width="17" className="mt-0.5 mr-2" height={'17'} alt="Google" /> Sign In With Google
+            </>
+          )}
         </button>
         <form onSubmit={formik.handleSubmit} className=" rounded-lg shadow-lg bg-white flex flex-col space-y-2 p-6">
           <div>
