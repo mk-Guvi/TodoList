@@ -1,6 +1,7 @@
 import { signOut, useSession } from 'next-auth/react';
 import React, { useMemo, useState } from 'react';
 import { Container, Icon } from '../../components';
+import { LoaderSvg } from '../../components/loaders/CircularLoader';
 import { LargeText, SmallText } from '../../components/typography';
 import TodolistRenderer from './todolistRenderer';
 
@@ -30,7 +31,7 @@ export const TodoListContext = React.createContext<TodoListContextT>({
 });
 function TodoListContainer() {
   const { data } = useSession();
-  signOut;
+  const [signoutLoading, setSignoutLoading] = useState(false);
   const [state, setState] = useState<TodoListContainerStateT>({
     collapsedItems: {},
     editingItems: {},
@@ -38,6 +39,12 @@ function TodoListContainer() {
   });
   const onChangeState = (payload: Partial<TodoListContainerStateT>) => {
     setState((prevState) => ({ ...prevState, ...payload }));
+  };
+  const onSignout = async () => {
+    setSignoutLoading(true);
+    await signOut({
+      callbackUrl: '/login',
+    });
   };
 
   const getSubTitle = useMemo(() => {
@@ -83,11 +90,15 @@ function TodoListContainer() {
             <LargeText className="text-xl font-medium break-words">Welcome back, {data?.user?.name || 'New User'}</LargeText>
             <SmallText className=" break-words">{getSubTitle}</SmallText>
           </div>
-          <Icon
-            onClick={() => signOut()}
-            icon="log-out"
-            className="p-1 rounded text-gray-700 transition-all h-6 w-6 duration-150 hover:bg-gray-200 cursor-pointer"
-          />
+          {signoutLoading ? (
+            <LoaderSvg type="SECONDARY" size="5" />
+          ) : (
+            <Icon
+              onClick={onSignout}
+              icon="log-out"
+              className="p-1 rounded text-gray-700 transition-all h-6 w-6 duration-150 hover:bg-gray-200 cursor-pointer"
+            />
+          )}
         </div>
         <div className="h-5/6 w-full  pt-4 sm:pt-2 ">
           <TodolistRenderer />
